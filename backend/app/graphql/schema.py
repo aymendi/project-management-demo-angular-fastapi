@@ -1,18 +1,15 @@
 import strawberry
-from strawberry.fastapi import GraphQLRouter
 from app.graphql.auth import AuthMutations
+from app.graphql.products import ProductQueries, ProductMutations
 
 @strawberry.type
-class Query:
+class Query(ProductQueries):
     @strawberry.field
     def hello(self) -> str:
         return "GraphQL is up"
 
 @strawberry.type
-class Mutation(AuthMutations):
+class Mutation(AuthMutations, ProductMutations):
     pass
 
 schema = strawberry.Schema(query=Query, mutation=Mutation)
-
-def get_graphql_router():
-    return GraphQLRouter(schema)

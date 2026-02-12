@@ -1,32 +1,55 @@
-from fastapi import FastAPI
-from app.db.session import get_db
-from app.graphql.schema import get_graphql_router
+from fastapi import FastAPI, Request, BackgroundTasks
+from starlette.requests import HTTPConnection
+from strawberry.fastapi import GraphQLRouter
 
-from app.db.session import engine
+from app.db.session import SessionLocal, engine
 from app.db.base import Base
-from app.models.user import User
-from app.models.product import Product
 
-Base.metadata.create_all(bind=engine)
+from app.models.user import User  # noqa
+from app.models.product import Product  # noqa
+from app.graphql.schema import schema
 
 app = FastAPI()
+
+@app.middleware("http")
+async def db_session_middleware(request: Request, call_next):
+    request.state.db = SessionLocal()
+    try:
+        return await call_next(request)
+    finally:
+        request.state.db.close()
+
+def get_context(request: Request, background_tasks: BackgroundTasks, connection: HTTPConnection):
+    db = request.state.db
+
+    user = None
+    auth = request.headers.get("authorization")  # header names are case-insensitive
+
+    if auth and auth.lower().startswith("bearer "):
+        token = auth.split(" ", 1)[1].strip()
+        try:
+            payload = decode_token(token)
+            user_id = payload.get("userId")
+            if user_id is not None:
+                user = db.query(User).filter(User.id == int(user_id)).first()
+        except Exception:
+            user = None
+
+    return {
+        "request": request,
+        "db": db,
+        "user": user,
+        "background_tasks": background_tasks,
+        "connection": connection,
+    }
+
+graphql_app = GraphQLRouter(schema, context_getter=get_context)
+app.include_router(graphql_app, prefix="/graphql")
 
 @app.get("/health")
 def health():
     return {"status": "UP"}
 
-graphql_app = get_graphql_router()
-
-# inject DB session in GraphQL context
-@app.middleware("http")
-async def db_session_middleware(request, call_next):
-    response = await call_next(request)
-    return response
-
-# Strawberry context (db) via dependency-like pattern
-@graphql_app.context_getter
-def get_context():
-    db = next(get_db())
-    return {"db": db}
-
-app.include_router(graphql_app, prefix="/graphql")
+@app.on_event("startup")
+def on_startup():
+    Base.metadata.create_all(bind=engine)

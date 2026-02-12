@@ -1,3 +1,4 @@
+print(">>> LOADED app/graphql/auth.py <<<")
 import strawberry
 from sqlalchemy.orm import Session
 
@@ -18,6 +19,10 @@ class AuthMutations:
     @strawberry.mutation
     def register(self, info, username: str, email: str, password: str) -> AuthPayload:
         db: Session = info.context["db"]
+
+        # Debug (keep for now, remove later)
+        print("PASSWORD LEN BYTES =", len(password.encode("utf-8")))
+        print("PASSWORD PREVIEW =", repr(password[:80]))
 
         if db.query(User).filter(User.username == username).first():
             raise ValueError("Username already exists")
