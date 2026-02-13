@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 const TOKEN_KEY = 'token';
 
 @Injectable({ providedIn: 'root' })
-export class AuthTokenService {
+export class AuthTokenService { 
   getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY);
   }

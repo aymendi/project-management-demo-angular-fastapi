@@ -40,7 +40,7 @@ export const appConfig: ApplicationConfig = {
       return {
         link: authLink.concat(
           httpLink.create({
-            uri: 'http://localhost:8000/graphql',
+            uri: 'http://127.0.0.1:8000/graphql',
           })
         ),
         cache: new InMemoryCache(),

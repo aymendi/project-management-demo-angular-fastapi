@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.requests import HTTPConnection
 from strawberry.fastapi import GraphQLRouter
 
@@ -10,6 +11,15 @@ from app.models.product import Product  # noqa
 from app.graphql.schema import schema
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:4200", "http://127.0.0.1:4200"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.middleware("http")
 async def db_session_middleware(request: Request, call_next):
