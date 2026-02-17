@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.sidenav-container {
+  height: calc(100% - 64px);
+}
+
+.sidenav {
+  width: 260px;
+}
+
+/* ✅ Default (light mode) */
+:root.light-mode .content {
+  padding: 16px;
+  background-color: #f5f5f5;
+}
+
+/* ✅ Dark mode */
+:root.dark-mode .content {
+  padding: 16px;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+/* ✅ Make sidenav text visible in both modes */
+:root.light-mode .sidenav .mdc-list-item__primary-text {
+  color: #111111;
+}
+
+:root.dark-mode .sidenav .mdc-list-item__primary-text {
+  color: #ffffff;
+}
+
+/* Optional active item style */
+.active {
+  background-color: rgba(0, 0, 0, 0.08);
+  font-weight: 500;
+}
+
+:root.dark-mode .active {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Spacer */
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* Mobile */
+@media (max-width: 599px) {
+  .sidenav {
+    width: 80vw;
+  }
+}

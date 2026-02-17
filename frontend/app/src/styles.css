@@ -2,3 +2,64 @@
 @tailwind components;
 @tailwind utilities;
 
+
+:root.dark-mode {
+
+  /* Main page & layout containers */
+  body,
+  html,
+  mat-sidenav-container,
+  .mat-sidenav-content,
+  .content,
+  .inner-content {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+  }
+
+  /* Material form fields & inputs */
+  .mat-mdc-form-field {
+    --mdc-outlined-text-field-input-text-color: #e0e0e0 !important;
+    --mdc-outlined-text-field-focus-outline-color: #bb86fc !important;
+    --mdc-outlined-text-field-label-text-color: #bbbbbb !important;
+    --mdc-outlined-text-field-outline-color: #555555 !important;
+    --mdc-outlined-text-field-hover-outline-color: #888888 !important;
+  }
+
+  /* Input background & text */
+  input,
+  textarea,
+  .mat-mdc-text-field-wrapper,
+  .mat-mdc-filled-text-field,
+  .mat-mdc-outlined-text-field {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    caret-color: #bb86fc !important;
+  }
+
+  /* Placeholder text */
+  input::placeholder,
+  textarea::placeholder {
+    color: #888888 !important;
+    opacity: 1 !important;
+  }
+
+  /* Labels & hints */
+  .mat-mdc-form-field-label,
+  .mat-mdc-form-field-hint {
+    color: #bbbbbb !important;
+  }
+
+  /* Borders & focus rings */
+  .mat-mdc-form-field-outline,
+  .mat-mdc-form-field-underline {
+    border-color: #555555 !important;
+  }
+
+  /* Table cells & rows in dark mode */
+  .mat-mdc-table,
+  .mat-mdc-row,
+  .mat-mdc-cell {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+  }
+}

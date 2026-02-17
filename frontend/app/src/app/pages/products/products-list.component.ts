@@ -5,7 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { Apollo, QueryRef } from 'apollo-angular';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, shareReplay } from 'rxjs/operators';
+import { finalize, timeout, catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { Observable } from 'rxjs';
+
+import { TranslateModule } from '@ngx-translate/core';
 
 import {
   PRODUCTS_QUERY,
@@ -27,45 +31,45 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
 @Component({
   selector: 'app-products-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslateModule],
   template: `
     <div class="p-6 space-y-6">
       <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold">Products</h1>
+        <h1 class="text-2xl font-bold">{{ 'PRODUCTS' | translate }}</h1>
 
         <button
           class="px-4 py-2 rounded bg-zinc-800 text-white hover:bg-zinc-700"
           (click)="refresh()"
         >
-          Refresh
+          {{ 'REFRESH' | translate }}
         </button>
       </div>
 
       <!-- Create product -->
       <div class="p-4 rounded border border-zinc-200 space-y-3 max-w-xl">
-        <h2 class="font-semibold">Add product</h2>
+        <h2 class="font-semibold">{{ 'ADD_PRODUCT' | translate }}</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
           <input
             class="border rounded px-3 py-2"
-            placeholder="Name"
+            [placeholder]="'NAME' | translate"
             [(ngModel)]="form.name"
           />
           <input
             class="border rounded px-3 py-2"
-            placeholder="Description (optional)"
+            [placeholder]="'DESCRIPTION_OPT' | translate"
             [(ngModel)]="form.description"
           />
           <input
             class="border rounded px-3 py-2"
             type="number"
-            placeholder="Price"
+            [placeholder]="'PRICE' | translate"
             [(ngModel)]="form.price"
           />
           <input
             class="border rounded px-3 py-2"
             type="number"
-            placeholder="Quantity"
+            [placeholder]="'QUANTITY' | translate"
             [(ngModel)]="form.quantity"
           />
         </div>
@@ -75,7 +79,7 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
           (click)="createProduct()"
           [disabled]="loadingCreate || !form.name"
         >
-          {{ loadingCreate ? 'Creating...' : 'Create' }}
+          {{ loadingCreate ? ('CREATING' | translate) : ('CREATE' | translate) }}
         </button>
 
         <p *ngIf="errorCreate" class="text-red-600 text-sm">{{ errorCreate }}</p>
@@ -87,20 +91,26 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
           <thead class="bg-zinc-50">
             <tr>
               <th class="p-3">ID</th>
-              <th class="p-3">Name</th>
-              <th class="p-3">Price</th>
-              <th class="p-3">Quantity</th>
-              <th class="p-3">Actions</th>
+              <th class="p-3">{{ 'NAME' | translate }}</th>
+              <th class="p-3">{{ 'PRICE' | translate }}</th>
+              <th class="p-3">{{ 'QUANTITY' | translate }}</th>
+              <th class="p-3">{{ 'ACTIONS' | translate }}</th>
             </tr>
           </thead>
 
           <tbody>
-            <tr *ngIf="(loading$ | async) && (productsCount$ | async) === 0" class="border-t">
-              <td class="p-3" colspan="5">Loading...</td>
+            <tr
+              *ngIf="(loading$ | async) && (productsCount$ | async) === 0"
+              class="border-t"
+            >
+              <td class="p-3" colspan="5">{{ 'LOADING' | translate }}</td>
             </tr>
 
-            <tr *ngIf="!(loading$ | async) && (productsCount$ | async) === 0" class="border-t">
-              <td class="p-3" colspan="5">No products yet.</td>
+            <tr
+              *ngIf="!(loading$ | async) && (productsCount$ | async) === 0"
+              class="border-t"
+            >
+              <td class="p-3" colspan="5">{{ 'NO_PRODUCTS' | translate }}</td>
             </tr>
 
             <tr *ngFor="let p of (products$ | async) ?? []" class="border-t">
@@ -109,7 +119,10 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
               <!-- Name -->
               <td class="p-3">
                 <ng-container *ngIf="editingId === p.id; else nameView">
-                  <input class="border rounded px-2 py-1 w-full" [(ngModel)]="editForm.name" />
+                  <input
+                    class="border rounded px-2 py-1 w-full"
+                    [(ngModel)]="editForm.name"
+                  />
                 </ng-container>
                 <ng-template #nameView>{{ p.name }}</ng-template>
               </td>
@@ -117,7 +130,11 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
               <!-- Price -->
               <td class="p-3">
                 <ng-container *ngIf="editingId === p.id; else priceView">
-                  <input class="border rounded px-2 py-1 w-32" type="number" [(ngModel)]="editForm.price" />
+                  <input
+                    class="border rounded px-2 py-1 w-32"
+                    type="number"
+                    [(ngModel)]="editForm.price"
+                  />
                 </ng-container>
                 <ng-template #priceView>{{ p.price }}</ng-template>
               </td>
@@ -125,7 +142,11 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
               <!-- Quantity -->
               <td class="p-3">
                 <ng-container *ngIf="editingId === p.id; else qtyView">
-                  <input class="border rounded px-2 py-1 w-24" type="number" [(ngModel)]="editForm.quantity" />
+                  <input
+                    class="border rounded px-2 py-1 w-24"
+                    type="number"
+                    [(ngModel)]="editForm.quantity"
+                  />
                 </ng-container>
                 <ng-template #qtyView>{{ p.quantity }}</ng-template>
               </td>
@@ -138,19 +159,31 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
                     (click)="saveEdit()"
                     [disabled]="loadingUpdate"
                   >
-                    {{ loadingUpdate ? 'Saving...' : 'Save' }}
+                    {{
+                      loadingUpdate
+                        ? ('SAVING' | translate)
+                        : ('SAVE' | translate)
+                    }}
                   </button>
 
-                  <button class="px-3 py-1 rounded bg-zinc-200 ml-2" (click)="cancelEdit()">
-                    Cancel
+                  <button
+                    class="px-3 py-1 rounded bg-zinc-200 ml-2"
+                    (click)="cancelEdit()"
+                  >
+                    {{ 'CANCEL' | translate }}
                   </button>
 
-                  <p *ngIf="errorUpdate" class="text-red-600 text-xs mt-2">{{ errorUpdate }}</p>
+                  <p *ngIf="errorUpdate" class="text-red-600 text-xs mt-2">
+                    {{ errorUpdate }}
+                  </p>
                 </ng-container>
 
                 <ng-template #normalActions>
-                  <button class="px-3 py-1 rounded bg-zinc-200" (click)="startEdit(p)">
-                    Edit
+                  <button
+                    class="px-3 py-1 rounded bg-zinc-200"
+                    (click)="startEdit(p)"
+                  >
+                    {{ 'EDIT' | translate }}
                   </button>
 
                   <button
@@ -158,7 +191,11 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
                     (click)="deleteProduct(p.id)"
                     [disabled]="loadingDeleteId === p.id"
                   >
-                    {{ loadingDeleteId === p.id ? 'Deleting...' : 'Delete' }}
+                    {{
+                      loadingDeleteId === p.id
+                        ? ('DELETING' | translate)
+                        : ('DELETE' | translate)
+                    }}
                   </button>
                 </ng-template>
               </td>
@@ -177,25 +214,21 @@ export class ProductsListComponent implements OnInit {
 
   private productsQuery!: QueryRef<ProductsQueryResult>;
 
-  // ✅ UI driven by observables
   products$!: Observable<Product[]>;
   loading$!: Observable<boolean>;
   productsCount$!: Observable<number>;
 
   error: string | null = null;
 
-  // Create form
   form = { name: '', description: null as string | null, price: 0, quantity: 0 };
   loadingCreate = false;
   errorCreate: string | null = null;
 
-  // Edit state
   editingId: string | null = null;
   editForm = { name: '', description: null as string | null, price: 0, quantity: 0 };
   loadingUpdate = false;
   errorUpdate: string | null = null;
 
-  // Delete loading by id
   loadingDeleteId: string | null = null;
 
   ngOnInit(): void {
@@ -332,24 +365,40 @@ export class ProductsListComponent implements OnInit {
   deleteProduct(id: string) {
     if (!confirm('Delete this product?')) return;
 
-    this.loadingDeleteId = id;
-    this.error = null;
+  this.loadingDeleteId = id;
+  this.error = null;
 
-    this.apollo
-      .mutate<{ deleteProduct: boolean }>({
-        mutation: DELETE_PRODUCT_MUTATION,
-        variables: { id },
-        refetchQueries: [{ query: PRODUCTS_QUERY }],
+  this.apollo
+    .mutate<{ deleteProduct: boolean }>({
+      mutation: DELETE_PRODUCT_MUTATION,
+      variables: { id },
+      refetchQueries: [{ query: PRODUCTS_QUERY }],
+    })
+    .pipe(
+      timeout(8000), // if backend doesn't respond in 8s -> error
+      catchError((err) => {
+        return throwError(() => err);
+      }),
+      finalize(() => {
+        this.loadingDeleteId = null; // always reset
       })
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.loadingDeleteId = null;
-        },
-        error: (err) => {
-          this.loadingDeleteId = null;
-          this.error = err?.message ?? 'Failed to delete product';
-        },
-      });
+    )
+    .subscribe({
+      next: (res) => {
+        // optional: if backend returns false
+        if (res.data?.deleteProduct === false) {
+          this.error = 'Delete was rejected by the server';
+        }
+      },
+      error: (err) => {
+        const msg = err?.message ?? '';
+        if (msg.toLowerCase().includes('forbidden')) {
+           this.error = 'You are not allowed to delete products';
+          } else {
+            this.error = msg || 'Failed to delete product';
+          }
+
+      },
+    });
   }
 }

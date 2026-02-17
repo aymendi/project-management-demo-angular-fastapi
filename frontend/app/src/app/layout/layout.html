@@ -1,0 +1,38 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span>{{ 'APP_TITLE' | translate }}</span>
+
+  <span class="spacer"></span>
+
+  <button mat-icon-button (click)="logout()" aria-label="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened class="sidenav">
+    <mat-nav-list>
+      @for (item of menuItems; track item.label) {
+        @if (item.route) {
+          <a mat-list-item [routerLink]="item.route" routerLinkActive="active">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label | translate }}</span>
+          </a>
+        } @else {
+          <button mat-list-item type="button" (click)="item.action?.()">
+          <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+          <span>{{ item.label }}</span>
+          </button>
+
+        }
+      }
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
