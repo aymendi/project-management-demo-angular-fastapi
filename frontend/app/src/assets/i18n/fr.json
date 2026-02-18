@@ -20,5 +20,19 @@
   "NO_PRODUCTS": "Aucun produit.",
   "CREATING": "Création...",
   "SAVING": "Enregistrement...",
-  "DELETING": "Suppression..."
+  "DELETING": "Suppression...",
+
+  "LOGIN": {
+    "TITLE": "Connexion",
+    "SUBTITLE": "Connectez-vous pour accéder aux produits.",
+    "USERNAME": "Nom d'utilisateur",
+    "USERNAME_PLACEHOLDER": "ex: aymen",
+    "USERNAME_REQUIRED": "Nom d'utilisateur obligatoire",
+    "PASSWORD": "Mot de passe",
+    "PASSWORD_PLACEHOLDER": "••••••",
+    "PASSWORD_REQUIRED": "Mot de passe obligatoire",
+    "BUTTON": "Se connecter"
+    
+  }
 }
+

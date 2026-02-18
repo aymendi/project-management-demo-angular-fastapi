@@ -20,5 +20,17 @@
   "NO_PRODUCTS": "No products yet.",
   "CREATING": "Creating...",
   "SAVING": "Saving...",
-  "DELETING": "Deleting..."
+  "DELETING": "Deleting...",
+  "LOGIN": {
+    "TITLE": "Login",
+    "SUBTITLE": "Sign in to access products.",
+    "USERNAME": "Username",
+    "USERNAME_PLACEHOLDER": "e.g. aymen",
+    "USERNAME_REQUIRED": "Username is required",
+    "PASSWORD": "Password",
+    "PASSWORD_PLACEHOLDER": "••••••",
+    "PASSWORD_REQUIRED": "Password is required",
+    "BUTTON": "Login",
+    "LOADING": "Signing in..."
+}
 }

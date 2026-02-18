@@ -5,17 +5,18 @@ import { LayoutComponent } from './layout/layout';
 import { authGuard } from './auth.guard';
 
 export const routes: Routes = [
+  { path: '', pathMatch: 'full', redirectTo: 'login' },
+
   { path: 'login', component: LoginComponent },
 
   {
     path: '',
     component: LayoutComponent,
-    canActivateChild: [authGuard],   // protects /products and future children
+    canActivateChild: [authGuard],
     children: [
       { path: 'products', component: ProductsListComponent },
-      { path: '', redirectTo: 'products', pathMatch: 'full' }
-    ]
+    ],
   },
 
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'login' },
 ];

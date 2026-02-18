@@ -4,12 +4,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/spec",
-    "types": [
-      "vitest/globals"
-    ]
+    "types": ["jest", "node"]
   },
-  "include": [
-    "src/**/*.d.ts",
-    "src/**/*.spec.ts"
-, "src/app/shared/theme.service.ts"  ]
+  "files": ["src/setup-jest.ts"],
+  "include": ["src/**/*.spec.ts", "src/**/*.d.ts"]
 }

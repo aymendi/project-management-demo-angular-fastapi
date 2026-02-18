@@ -1,6 +1,8 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
+
 
 import { Apollo } from 'apollo-angular';
 import { gql } from '@apollo/client/core';
@@ -19,56 +21,12 @@ const LOGIN_MUTATION = gql`
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule],
-  template: `
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-    <div class="w-full max-w-md rounded-2xl border bg-white p-6 shadow-sm">
-      <h1 class="text-2xl font-bold">Login</h1>
-      <p class="text-sm text-gray-500 mb-6">Connecte-toi pour accéder aux produits.</p>
-
-      <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium mb-1">Username</label>
-          <input
-            class="w-full rounded-lg border p-2 outline-none focus:ring"
-            formControlName="username"
-            placeholder="ex: aymen"
-          />
-          <p class="mt-1 text-xs text-red-600"
-             *ngIf="form.controls.username.touched && form.controls.username.invalid">
-            Username obligatoire
-          </p>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium mb-1">Password</label>
-          <input
-            type="password"
-            class="w-full rounded-lg border p-2 outline-none focus:ring"
-            formControlName="password"
-            placeholder="••••••"
-          />
-          <p class="mt-1 text-xs text-red-600"
-             *ngIf="form.controls.password.touched && form.controls.password.invalid">
-            Password obligatoire
-          </p>
-        </div>
-
-        <button
-          class="w-full rounded-lg bg-black text-white p-2 font-semibold disabled:opacity-50"
-          type="submit"
-          [disabled]="form.invalid || loading"
-        >
-          {{ loading ? 'Connexion...' : 'Login' }}
-        </button>
-
-        <p class="text-sm text-red-600" *ngIf="error">{{ error }}</p>
-      </form>
-    </div>
-  </div>
-`,
-
-})
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css'],
+})  
+  
+  
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private apollo = inject(Apollo);
@@ -84,12 +42,17 @@ export class LoginComponent {
   });
 
   submit() {
-    if (this.form.invalid) return;
+    if (this.form.invalid) {
+      this.form.markAllAsTouched(); // ✅ show validation immediately
+      return;
+    }
 
     this.loading = true;
     this.error = null;
 
-    const { username, password } = this.form.getRawValue();
+    const raw = this.form.getRawValue();
+    const username = (raw.username ?? '').trim();
+    const password = raw.password ?? '';
 
     this.apollo
       .mutate({
@@ -97,23 +60,35 @@ export class LoginComponent {
         variables: { username, password },
       })
       .subscribe({
-        next: (res) => {
+        next: (res: any) => {
           this.loading = false;
 
-          const data: any = res.data;
-          const token = data?.login?.token;
+          const token = res?.data?.login?.token;
+          const role = res?.data?.login?.user?.role;
 
           if (!token) {
             this.error = 'Login failed';
             return;
           }
 
+          // ✅ store token
           this.tokenService.setToken(token);
+
+          // ✅ store role for RBAC (ADMIN/USER)
+          if (role) localStorage.setItem('role', role);
+
           this.router.navigateByUrl('/products');
         },
-        error: () => {
+        error: (err) => {
           this.loading = false;
-          this.error = 'Invalid credentials or server unreachable';
+
+          // ✅ best error extraction for GraphQL
+          const gqlMsg =
+            err?.graphQLErrors?.[0]?.message ||
+            err?.networkError?.message ||
+            err?.message;
+
+          this.error = gqlMsg || 'Invalid credentials or server unreachable';
         },
       });
   }

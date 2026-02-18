@@ -1,0 +1,65 @@
+<div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="w-full max-w-md rounded-2xl border bg-white p-6 shadow-sm">
+    <h1 class="text-2xl font-bold">{{ 'LOGIN.TITLE' | translate }}</h1>
+    <p class="text-sm text-gray-500 mb-6">
+      {{ 'LOGIN.SUBTITLE' | translate }}
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-1">
+          {{ 'LOGIN.USERNAME' | translate }}
+        </label>
+
+        <input
+          class="w-full rounded-lg border p-2 outline-none focus:ring"
+          formControlName="username"
+          [placeholder]="'LOGIN.USERNAME_PLACEHOLDER' | translate"
+          autocomplete="username"
+        />
+
+        <p
+          class="mt-1 text-xs text-red-600"
+          *ngIf="form.controls.username.touched && form.controls.username.invalid"
+        >
+          {{ 'LOGIN.USERNAME_REQUIRED' | translate }}
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">
+          {{ 'LOGIN.PASSWORD' | translate }}
+        </label>
+
+        <input
+          type="password"
+          class="w-full rounded-lg border p-2 outline-none focus:ring"
+          formControlName="password"
+          [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
+          autocomplete="current-password"
+        />
+
+        <p
+          class="mt-1 text-xs text-red-600"
+          *ngIf="form.controls.password.touched && form.controls.password.invalid"
+        >
+          {{ 'LOGIN.PASSWORD_REQUIRED' | translate }}
+        </p>
+      </div>
+
+      <button
+        class="w-full rounded-lg bg-black text-white p-2 font-semibold disabled:opacity-50"
+        type="submit"
+        [disabled]="loading"
+      >
+        {{
+          loading ? ('LOGIN.LOADING' | translate) : ('LOGIN.BUTTON' | translate)
+        }}
+      </button>
+
+      <p class="text-sm text-red-600" *ngIf="error">
+        {{ error }}
+      </p>
+    </form>
+  </div>
+</div>
