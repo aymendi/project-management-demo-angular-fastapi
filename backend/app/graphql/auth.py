@@ -20,7 +20,7 @@ class AuthMutations:
     def register(self, info, username: str, email: str, password: str) -> AuthPayload:
         db: Session = info.context["db"]
 
-        # Debug (keep for now, remove later)
+        # Debug 
         print("PASSWORD LEN BYTES =", len(password.encode("utf-8")))
         print("PASSWORD PREVIEW =", repr(password[:80]))
 

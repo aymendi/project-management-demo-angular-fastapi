@@ -1,12 +1,16 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { NgIf, AsyncPipe } from '@angular/common';
+
+import { LoadingService } from './shared/loading.service';
+import { ToastComponent } from './shared/toast.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, NgIf, AsyncPipe, ToastComponent],
   templateUrl: './app.component.html',
-  styleUrl: './app.css'
 })
-export class App {
-  protected readonly title = signal('app');
+export class AppComponent {
+  loading$ = inject(LoadingService).loading$;
 }

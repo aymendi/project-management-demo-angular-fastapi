@@ -16,6 +16,10 @@ import { setContext } from '@apollo/client/link/context';
 import { importProvidersFrom } from '@angular/core';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { ApolloLink } from '@apollo/client/core';
+import { createErrorLink, createLoadingLink } from './graphql/apollo-links';
+
+
 
 import { AuthTokenService } from './auth-token.service';
 
@@ -43,26 +47,33 @@ export const appConfig: ApplicationConfig = {
     ),
 
     provideApollo(() => {
-      const httpLink = inject(HttpLink);
-      const tokenService = inject(AuthTokenService);
+  const httpLink = inject(HttpLink);
+  const tokenService = inject(AuthTokenService);
 
-      const authLink = setContext(() => {
-        const token = tokenService.getToken();
-        let headers = new HttpHeaders();
+  const authLink = setContext(() => {
+    const token = tokenService.getToken();
+    let headers = new HttpHeaders();
 
-        if (token) headers = headers.set('Authorization', `Bearer ${token}`);
+    if (token) headers = headers.set('Authorization', `Bearer ${token}`);
 
-        return { headers };
-      });
+    return { headers };
+  });
 
-      return {
-        link: authLink.concat(
-          httpLink.create({
-            uri: 'http://127.0.0.1:8000/graphql',
-          })
-        ),
-        cache: new InMemoryCache(),
-      };
+  const errorLink = createErrorLink();
+  const loadingLink = createLoadingLink();
+
+  const link = ApolloLink.from([
+    authLink,       // adds Authorization header
+    errorLink,      // global error handling
+    loadingLink,    // global loading state
+    httpLink.create({ uri: 'http://127.0.0.1:8000/graphql' }),
+  ]);
+
+  return {
+    link,
+    cache: new InMemoryCache(),
+       };
     }),
+
   ],
 };

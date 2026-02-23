@@ -1,1 +1,7 @@
+<app-toast></app-toast>
+
+<div *ngIf="loading$ | async" class="fixed top-3 left-3 bg-black text-white px-3 py-2 rounded z-50">
+  Loading...
+</div>
+
 <router-outlet></router-outlet>

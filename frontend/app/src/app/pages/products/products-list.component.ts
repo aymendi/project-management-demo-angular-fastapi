@@ -167,11 +167,13 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
                   </button>
 
                   <button
-                    class="px-3 py-1 rounded bg-zinc-200 ml-2"
-                    (click)="cancelEdit()"
-                  >
-                    {{ 'CANCEL' | translate }}
-                  </button>
+  class="px-3 py-1 rounded bg-zinc-200 text-zinc-900 ml-2
+         dark:bg-zinc-700 dark:text-zinc-100
+         hover:bg-zinc-300 dark:hover:bg-zinc-600"
+  (click)="cancelEdit()"
+>
+  {{ 'CANCEL' | translate }}
+</button>
 
                   <p *ngIf="errorUpdate" class="text-red-600 text-xs mt-2">
                     {{ errorUpdate }}
@@ -179,12 +181,15 @@ type ProductsQueryResult = { products: Array<Partial<Product>> };
                 </ng-container>
 
                 <ng-template #normalActions>
-                  <button
-                    class="px-3 py-1 rounded bg-zinc-200"
-                    (click)="startEdit(p)"
-                  >
-                    {{ 'EDIT' | translate }}
-                  </button>
+                <button
+                  class="px-3 py-1 rounded bg-zinc-200 text-zinc-900
+                    dark:bg-zinc-700 dark:text-zinc-100
+                  hover:bg-zinc-300 dark:hover:bg-zinc-600"
+                   (click)="startEdit(p)" 
+                    >
+                    
+                   {{ 'EDIT' | translate }}
+              </button>
 
                   <button
                     class="px-3 py-1 rounded bg-red-600 text-white ml-2 disabled:opacity-50"
